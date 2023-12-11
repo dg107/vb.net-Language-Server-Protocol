@@ -1,27 +1,46 @@
 /**
- * This is a very basic outline for a VB.NET parser.
- * In a full implementation, you would need to parse the VB.NET syntax and semantics accurately.
+ * This expanded version includes basic handling for function declarations,
+ * variable assignments, and comments in VB.NET.
  */
 
-// This is a placeholder function that represents the parsing process.
-// It should be replaced with actual parsing logic.
 export function parseVBNETCode(code: string): VBNETParseResult {
-    // Basic implementation of parsing.
-    // In reality, you would have a complex parser here that understands VB.NET syntax.
+    let lines = code.split('\n');
+    let parseResult: VBNETParseResult = { isValid: true, functions: [], variables: [], comments: [], errors: [] };
 
-    // This example simply checks for a specific keyword for demonstration.
-    if (code.includes("Sub")) {
-        return { isValid: true, message: "Found a 'Sub' declaration" };
-    } else {
-        return { isValid: false, message: "No 'Sub' declaration found" };
+    lines.forEach((line, index) => {
+        line = line.trim();
+
+        // Check for function declarations
+        if (line.startsWith('Sub ') || line.startsWith('Function ')) {
+            parseResult.functions.push({ line: index + 1, declaration: line });
+        }
+
+        // Check for variable assignments
+        if (line.includes(' Dim ')) {
+            parseResult.variables.push({ line: index + 1, declaration: line });
+        }
+
+        // Check for comments
+        if (line.startsWith("'")) {
+            parseResult.comments.push({ line: index + 1, comment: line });
+        }
+
+        // Add more parsing rules here for other VB.NET constructs
+    });
+
+    if (parseResult.functions.length === 0 && parseResult.variables.length === 0) {
+        parseResult.isValid = false;
+        parseResult.errors.push("No functions or variables found.");
     }
+
+    return parseResult;
 }
 
-// Define the structure of your parsing result.
-// You can expand this to include more detailed information as needed.
 interface VBNETParseResult {
     isValid: boolean;
-    message: string;
-    // Add other fields like error details, parsed tokens, etc.
+    functions: Array<{ line: number, declaration: string }>;
+    variables: Array<{ line: number, declaration: string }>;
+    comments: Array<{ line: number, comment: string }>;
+    errors: string[];
 }
 
